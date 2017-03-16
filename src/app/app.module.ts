@@ -5,8 +5,12 @@ import { LoginPage } from '../pages/login/login';
 
 import { Page1 } from '../pages/page1/page1';
 import { SettingsPage } from '../pages/settings/settings';
+import { SignupPage } from '../pages/signup/signup';
+
 
 import { Auth } from '../providers/auth';
+import { IpfsProvider } from '../providers/ipfs';
+
 import { IonicStorageModule } from '@ionic/storage';
 
 @NgModule({
@@ -14,7 +18,8 @@ import { IonicStorageModule } from '@ionic/storage';
       MyApp,
       LoginPage,
       Page1,
-      SettingsPage
+      SettingsPage,
+      SignupPage
   ],
   imports: [
       IonicModule.forRoot(MyApp),
@@ -25,8 +30,9 @@ import { IonicStorageModule } from '@ionic/storage';
       MyApp,
       LoginPage,
       Page1,
-      SettingsPage
+      SettingsPage,
+      SignupPage
   ],
-  providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}, Auth]
+  providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}, Auth, IpfsProvider]
 })
 export class AppModule {}

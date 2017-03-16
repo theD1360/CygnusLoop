@@ -1,5 +1,8 @@
 Photo backup app
 
+Stack:
+* ionic v2
+
 TO DOS:
 * Install and implement cloud storage.
 * Create API service and calls (login, files, albums, etc...)

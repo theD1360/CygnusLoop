@@ -63,12 +63,12 @@ export class Auth {
 
   logout() {
     return new Promise((resolve) => {
-      setTimeout(() => {
+      // setTimeout(() => {
 
         this.storage.set('userToken', null);
         resolve(null);
 
-      }, 3000);
+      // }, 3000);
     });
   }
 

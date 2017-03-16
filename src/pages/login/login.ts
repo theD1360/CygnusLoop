@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { Page1 } from '../../pages/page1/page1';
+import { SignupPage } from '../../pages/signup/signup';
 
 import { Auth } from '../../providers/auth';
 
@@ -29,5 +30,10 @@ export class LoginPage {
       }
     });
   }
+
+  navigateToSignup() {
+    return this.navCtrl.setRoot(SignupPage);
+  }
+
 
 }
