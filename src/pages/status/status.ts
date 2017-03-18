@@ -1,26 +1,22 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
-import {StatusPage} from "../status/status";
 
 /*
-  Generated class for the Settings page.
+  Generated class for the Status page.
 
   See http://ionicframework.com/docs/v2/components/#navigation for more info on
   Ionic pages and navigation.
 */
 @Component({
-  selector: 'page-settings',
-  templateUrl: 'settings.html'
+  selector: 'page-status',
+  templateUrl: 'status.html'
 })
-export class SettingsPage {
+export class StatusPage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad SettingsPage');
+    console.log('ionViewDidLoad StatusPage');
   }
 
-  status(){
-    this.navCtrl.setRoot(StatusPage);
-  }
 }

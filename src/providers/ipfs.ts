@@ -35,7 +35,7 @@ export class IpfsProvider {
                     init: false,
                     start: false,
                     EXPERIMENTAL: {
-                        pubsub: false
+                        pubsub: true
                     }
                 }
             );

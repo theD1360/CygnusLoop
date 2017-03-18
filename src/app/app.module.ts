@@ -5,6 +5,8 @@ import { LoginPage } from '../pages/login/login';
 
 import { Page1 } from '../pages/page1/page1';
 import { SettingsPage } from '../pages/settings/settings';
+import { StatusPage } from '../pages/status/status';
+
 import { SignupPage } from '../pages/signup/signup';
 
 
@@ -19,7 +21,8 @@ import { IonicStorageModule } from '@ionic/storage';
       LoginPage,
       Page1,
       SettingsPage,
-      SignupPage
+      SignupPage,
+      StatusPage
   ],
   imports: [
       IonicModule.forRoot(MyApp),
@@ -31,7 +34,8 @@ import { IonicStorageModule } from '@ionic/storage';
       LoginPage,
       Page1,
       SettingsPage,
-      SignupPage
+      SignupPage,
+      StatusPage
   ],
   providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}, Auth, IpfsProvider]
 })
