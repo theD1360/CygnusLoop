@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {Http} from '@angular/http';
 import 'rxjs/add/operator/map';
 import * as IPFS from 'ipfs';
+import fetch from 'node-fetch';
 /*
  Generated class for the Ipfs provider.
 
@@ -70,5 +71,42 @@ export class IpfsProvider {
     }
 
 
+    addFile(file) {
+
+      return new Promise((resolve, reject) => {
+        this.node.files.add(file, (err, res) => {
+          if (err) {
+            reject(err);
+          }
+
+          const hash = res[0].hash;
+
+          this.node.files.cat(hash, (err, res) => {
+            if (err) {
+              reject(err);
+            }
+
+            let data = '';
+            res.on('data', (d) => {
+              data = data + d
+            });
+
+            res.on('end', () => {
+              resolve(data);
+            })
+          })
+        })
+      });
+
+    }
+
+    addFromUrl(url = '') {
+        return fetch(url)
+          .then(function(res) {
+            return this.addFile(res.buffer());
+          }).then(function(body) {
+            console.log(body);
+        });
+    }
 
 }

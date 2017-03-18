@@ -2,12 +2,16 @@ import {Component, ViewChild} from '@angular/core';
 import {Nav, Platform, LoadingController} from 'ionic-angular';
 //import { Splashscreen } from 'ionic-native';
 
-import {Page1} from '../pages/page1/page1';
-import {SettingsPage} from '../pages/settings/settings';
-import {LoginPage} from '../pages/login/login';
-import {Storage} from '@ionic/storage';
-import {Auth} from '../providers/auth';
-import {IpfsProvider} from "../providers/ipfs";
+import { Page1 } from '../pages/page1/page1';
+import { SettingsPage } from '../pages/settings/settings';
+import { LoginPage } from '../pages/login/login';
+import { AlbumsPage } from '../pages/albums/albums';
+
+import { Storage } from '@ionic/storage';
+import { Auth } from '../providers/auth';
+import { IpfsProvider } from "../providers/ipfs";
+import { PhotoLibrary } from 'ionic-native';
+
 
 
 @Component({
@@ -27,7 +31,9 @@ export class MyApp {
         // used for an example of ngFor and navigation
         this.pages = [];
         // used for an example of ngFor and navigation
-        this.pages.push({title: 'Dash', component: Page1});
+        this.pages.push({title: 'Home', component: Page1});
+        this.pages.push({title: 'Albums', component: AlbumsPage});
+
         this.pages.push({title: 'Settings', component: SettingsPage});
     }
 
@@ -41,6 +47,8 @@ export class MyApp {
             this.ipfs.getNode().then((node)=>{
                 node.id((err, id)=>{console.log(id)})
                 this.status = node.isOnline() ? "online": "offline";
+
+                this.fetchFiles();
             });
 
 
@@ -87,6 +95,30 @@ export class MyApp {
         this.auth.logout().then(() => {
             this.nav.setRoot(LoginPage);
         });
+    }
+
+    fetchFiles(){
+      PhotoLibrary.requestAuthorization().then(() => {
+        PhotoLibrary.getLibrary().subscribe({
+          next: library => {
+            library.forEach(function(libraryItem) {
+              console.log(libraryItem.id);          // ID of the photo
+              console.log(libraryItem.photoURL);    // Cross-platform access to photo
+              console.log(libraryItem.thumbnailURL);// Cross-platform access to thumbnail
+              console.log(libraryItem.fileName);
+              console.log(libraryItem.width);
+              console.log(libraryItem.height);
+              console.log(libraryItem.creationDate);
+              console.log(libraryItem.latitude);
+              console.log(libraryItem.longitude);
+              console.log(libraryItem.albumIds);    // array of ids of appropriate AlbumItem, only of includeAlbumsData was used
+            });
+          },
+          error: err => {},
+          complete: () => { console.log("could not get photos"); }
+        });
+      })
+        .catch(err => console.log("permissions weren't granted"));
     }
 
 }
