@@ -2,7 +2,8 @@ import {Injectable} from '@angular/core';
 import {Http} from '@angular/http';
 import 'rxjs/add/operator/map';
 import * as IPFS from 'ipfs';
-import fetch from 'node-fetch';
+import { Buffer } from 'buffer';
+
 /*
  Generated class for the Ipfs provider.
 
@@ -27,16 +28,15 @@ export class IpfsProvider {
 
     }
 
+
     start(config = {}) {
         this.node = new Promise((resolve, reject) => {
 
             let node =  new IPFS(
                 {
                     repo: this.repoPath,
-                    init: false,
-                    start: false,
                     EXPERIMENTAL: {
-                        pubsub: true
+                        pubsub: false
                     }
                 }
             );
@@ -47,13 +47,22 @@ export class IpfsProvider {
                     return;
                 }
 
-                node.goOnline((err) => {
+                node.load(function(e){
+                  if (err) {
+                    reject(err)
+                  }
+
+                  node.goOnline((err) => {
                     if (err) {
-                        reject(err);
-                        return;
+                      reject(err);
+                      return;
                     }
                     resolve(node);
+                  });
+
                 });
+
+
 
             });
         });
@@ -72,41 +81,48 @@ export class IpfsProvider {
 
 
     addFile(file) {
+      let node = this.node;
+
 
       return new Promise((resolve, reject) => {
-        this.node.files.add(file, (err, res) => {
-          if (err) {
-            reject(err);
-          }
+        console.log(node.prototype);
 
-          const hash = res[0].hash;
+        node.then((node)=>{
+          console.log("Node REady", Buffer.isBuffer(file));
+          console.log(Object.getOwnPropertyNames(node.files));
+          node.files.add(file, function(e, res){
+            console.log("Adding File");
 
-          this.node.files.cat(hash, (err, res) => {
-            if (err) {
-              reject(err);
+            if(e || !res) {
+              console.error(e);
+              reject(e);
             }
 
-            let data = '';
-            res.on('data', (d) => {
-              data = data + d
-            });
 
-            res.on('end', () => {
-              resolve(data);
-            })
+
+            // const hash = res[0].hash;
+            //
+            // node.files.cat(hash, (err, res) => {
+            //   if (err) {
+            //     reject(err);
+            //   }
+            //
+            //   let data = '';
+            //   res.on('data', (d) => {
+            //     data = data + d
+            //   });
+            //
+            //   res.on('end', () => {
+            //     resolve(data);
+            //   })
+            // })
           })
-        })
+
+        });
+
       });
 
     }
 
-    addFromUrl(url = '') {
-        return fetch(url)
-          .then(function(res) {
-            return this.addFile(res.buffer());
-          }).then(function(body) {
-            console.log(body);
-        });
-    }
 
 }

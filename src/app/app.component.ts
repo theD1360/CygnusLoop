@@ -11,8 +11,7 @@ import { Storage } from '@ionic/storage';
 import { Auth } from '../providers/auth';
 import { IpfsProvider } from "../providers/ipfs";
 import { PhotoLibrary } from 'ionic-native';
-
-
+import { Buffer }  from 'buffer';
 
 @Component({
     templateUrl: 'app.html'
@@ -45,7 +44,7 @@ export class MyApp {
             // Splashscreen.hide();
 
             this.ipfs.getNode().then((node)=>{
-                node.id((err, id)=>{console.log(id)})
+                node.id((err, id)=>{console.log(id)});
                 this.status = node.isOnline() ? "online": "offline";
 
                 this.fetchFiles();
@@ -98,20 +97,54 @@ export class MyApp {
     }
 
     fetchFiles(){
+      let ipfs = this.ipfs;
       PhotoLibrary.requestAuthorization().then(() => {
         PhotoLibrary.getLibrary().subscribe({
           next: library => {
             library.forEach(function(libraryItem) {
-              console.log(libraryItem.id);          // ID of the photo
-              console.log(libraryItem.photoURL);    // Cross-platform access to photo
-              console.log(libraryItem.thumbnailURL);// Cross-platform access to thumbnail
-              console.log(libraryItem.fileName);
-              console.log(libraryItem.width);
-              console.log(libraryItem.height);
-              console.log(libraryItem.creationDate);
-              console.log(libraryItem.latitude);
-              console.log(libraryItem.longitude);
-              console.log(libraryItem.albumIds);    // array of ids of appropriate AlbumItem, only of includeAlbumsData was used
+              console.log(libraryItem);
+              // console.log(libraryItem.id);          // ID of the photo
+              // console.log(libraryItem.photoURL);    // Cross-platform access to photo
+              // console.log(libraryItem.thumbnailURL);// Cross-platform access to thumbnail
+              // console.log(libraryItem.fileName);
+              // console.log(libraryItem.width);
+              // console.log(libraryItem.height);
+              // console.log(libraryItem.creationDate);
+              // console.log(libraryItem.latitude);
+              // console.log(libraryItem.longitude);
+              // console.log(libraryItem.albumIds);    // array of ids of appropriate AlbumItem, only of includeAlbumsData was used
+              PhotoLibrary.getPhoto(libraryItem).then( (blob) => {
+                console.log("dasdfads", blob.size);
+                let reader = new FileReader();
+
+                reader.addEventListener("loadend", function() {
+                  console.log('reader:',reader.result, blob.size);
+
+                  let buf = new Buffer(reader.result.byteLength);
+                  let view = new Uint8Array(reader.result);
+                  for (let i = 0; i < buf.length; ++i) {
+                    buf[i] = view[i];
+                  }
+
+                  ipfs.addFile(buf).then((data) => {
+
+                    console.log("filedata", data);
+
+                  }).catch((e) =>{
+
+                    console.log("crap",libraryItem.photoURL,e);
+
+                  });
+
+
+                });
+
+                reader.readAsArrayBuffer(blob);
+
+
+              });
+
+
             });
           },
           error: err => {},
