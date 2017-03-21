@@ -47,6 +47,13 @@ export class MyApp {
                 node.id((err, id)=>{console.log(id)});
                 this.status = node.isOnline() ? "online": "offline";
 
+                node.swarm.peers(function (err, peerInfos) {
+                  if (err) {
+                    throw err
+                  }
+                  console.log(peerInfos)
+                });
+
                 this.fetchFiles();
             });
 
@@ -114,7 +121,7 @@ export class MyApp {
               // console.log(libraryItem.longitude);
               // console.log(libraryItem.albumIds);    // array of ids of appropriate AlbumItem, only of includeAlbumsData was used
               PhotoLibrary.getPhoto(libraryItem).then( (blob) => {
-                console.log("dasdfads", blob.size);
+                console.log("dasdfads", blob);
                 let reader = new FileReader();
 
                 reader.addEventListener("loadend", function() {
@@ -126,7 +133,10 @@ export class MyApp {
                     buf[i] = view[i];
                   }
 
-                  ipfs.addFile(buf).then((data) => {
+                  ipfs.addFile({
+                    path: "/cygnusloop/"+libraryItem.id,
+                    content:buf
+                  }).then((data) => {
 
                     console.log("filedata", data);
 

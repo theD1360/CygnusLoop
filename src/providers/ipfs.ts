@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Http} from '@angular/http';
 import 'rxjs/add/operator/map';
 import * as IPFS from 'ipfs';
-import { Buffer } from 'buffer';
+// import { Buffer } from 'buffer';
 
 /*
  Generated class for the Ipfs provider.
@@ -37,34 +37,26 @@ export class IpfsProvider {
                     repo: this.repoPath,
                     EXPERIMENTAL: {
                         pubsub: false
+                    },
+                  config: { // overload the default config
+                    Addresses: {
+                      Swarm: [
+                        '/ip4/127.0.0.1/tcp/1337',
+                        '/ip4/127.0.0.1/tcp/1337/ws'
+                      ]
                     }
+                  }
                 }
             );
 
-            node.init(config, (err) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-
-                node.load(function(e){
-                  if (err) {
-                    reject(err)
-                  }
-
-                  node.goOnline((err) => {
-                    if (err) {
-                      reject(err);
-                      return;
-                    }
-                    resolve(node);
-                  });
-
-                });
-
-
-
+            node.on('start', ()=>{
+              resolve(node);
             });
+
+            node.on('error', (err)=>{
+              console.log("Init Errors: ", err);
+            });
+
         });
 
         return this.node;
@@ -85,20 +77,17 @@ export class IpfsProvider {
 
 
       return new Promise((resolve, reject) => {
-        console.log(node.prototype);
-
         node.then((node)=>{
-          console.log("Node REady", Buffer.isBuffer(file));
-          console.log(Object.getOwnPropertyNames(node.files));
-          node.files.add(file, function(e, res){
-            console.log("Adding File");
+          console.log("Node REady", file);
 
-            if(e || !res) {
-              console.error(e);
-              reject(e);
-            }
-
-
+          node.files.add(file, (err, res) => {
+            console.log("Adding File", err, res);
+            resolve(res);
+            //
+            // if(e || !res) {
+            //   console.error(e);
+            //   reject(e);
+            // }
 
             // const hash = res[0].hash;
             //
@@ -116,7 +105,7 @@ export class IpfsProvider {
             //     resolve(data);
             //   })
             // })
-          })
+          });
 
         });
 
