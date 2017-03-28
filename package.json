@@ -31,6 +31,7 @@
     "node-fetch": "^1.6.3",
     "rxjs": "5.0.1",
     "sw-toolbox": "3.4.0",
+    "uuid": "^3.0.1",
     "zone.js": "0.7.2"
   },
   "devDependencies": {
@@ -44,6 +45,7 @@
     "cordova-plugin-device",
     "cordova-plugin-photo-library",
     "cordova-plugin-splashscreen",
+    "cordova-plugin-chrome-apps-sockets-tcp",
     "ionic-plugin-keyboard"
   ],
   "cordovaPlatforms": [

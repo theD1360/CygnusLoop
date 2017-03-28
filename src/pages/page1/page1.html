@@ -14,5 +14,11 @@
     If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will show you the way.
   </p>
 
+  <ion-list>
+    <ion-item menuClose ion-item *ngFor="let f of files">
+      {{f.hash}}
+    </ion-item>
+  </ion-list>
+
   <button ion-button secondary menuToggle>Toggle Menu</button>
 </ion-content>

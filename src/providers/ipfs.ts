@@ -33,20 +33,20 @@ export class IpfsProvider {
         this.node = new Promise((resolve, reject) => {
 
             let node =  new IPFS(
-                {
-                    repo: this.repoPath,
-                    EXPERIMENTAL: {
-                        pubsub: false
-                    },
-                  config: { // overload the default config
-                    Addresses: {
-                      Swarm: [
-                        '/ip4/127.0.0.1/tcp/1337',
-                        '/ip4/127.0.0.1/tcp/1337/ws'
-                      ]
-                    }
-                  }
-                }
+                // {
+                //     repo: this.repoPath,
+                //     EXPERIMENTAL: {
+                //         pubsub: false
+                //     },
+                //   config: { // overload the default config
+                //     Addresses: {
+                //       Swarm: [
+                //         '/ip4/127.0.0.1/tcp/1337',
+                //         '/ip4/127.0.0.1/tcp/1337/ws'
+                //       ]
+                //     }
+                //   }
+                // }
             );
 
             node.on('start', ()=>{
@@ -75,7 +75,7 @@ export class IpfsProvider {
     addFile(file) {
       let node = this.node;
 
-
+      console.log(node);
       return new Promise((resolve, reject) => {
         node.then((node)=>{
           console.log("Node REady", file);

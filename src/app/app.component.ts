@@ -12,6 +12,7 @@ import { Auth } from '../providers/auth';
 import { IpfsProvider } from "../providers/ipfs";
 import { PhotoLibrary } from 'ionic-native';
 import { Buffer }  from 'buffer';
+import {isArray} from "rxjs/util/isArray";
 
 @Component({
     templateUrl: 'app.html'
@@ -105,10 +106,15 @@ export class MyApp {
 
     fetchFiles(){
       let ipfs = this.ipfs;
+      let storage = this.storage;
+
+      storage.set('storageCache', []);
       PhotoLibrary.requestAuthorization().then(() => {
         PhotoLibrary.getLibrary().subscribe({
           next: library => {
             library.forEach(function(libraryItem) {
+
+              let filePath = "/cygnusloop/"+libraryItem.id+"/"+libraryItem.fileName;
               console.log(libraryItem);
               // console.log(libraryItem.id);          // ID of the photo
               // console.log(libraryItem.photoURL);    // Cross-platform access to photo
@@ -120,39 +126,61 @@ export class MyApp {
               // console.log(libraryItem.latitude);
               // console.log(libraryItem.longitude);
               // console.log(libraryItem.albumIds);    // array of ids of appropriate AlbumItem, only of includeAlbumsData was used
-              PhotoLibrary.getPhoto(libraryItem).then( (blob) => {
-                console.log("dasdfads", blob);
-                let reader = new FileReader();
 
-                reader.addEventListener("loadend", function() {
-                  console.log('reader:',reader.result, blob.size);
+              storage.get('storageCache').then((store) => {
+                let found = false
+                if(!isArray(store)) {
+                  store = [];
+                }
 
-                  let buf = new Buffer(reader.result.byteLength);
-                  let view = new Uint8Array(reader.result);
-                  for (let i = 0; i < buf.length; ++i) {
-                    buf[i] = view[i];
+                for (let x in store) {
+                  if (store[x].path == filePath) {
+                    found = true;
                   }
+                }
 
-                  ipfs.addFile({
-                    path: "/cygnusloop/"+libraryItem.id,
-                    content:buf
-                  }).then((data) => {
+                if (!found) {
+                  PhotoLibrary.getPhoto(libraryItem).then( (blob) => {
+                    console.log("dasdfads", blob);
+                    let reader = new FileReader();
 
-                    console.log("filedata", data);
+                    reader.addEventListener("loadend", ()=> {
+                      console.log('reader:',reader.result, blob.size);
 
-                  }).catch((e) =>{
+                      let buf = new Buffer(reader.result.byteLength);
+                      let view = new Uint8Array(reader.result);
+                      for (let i = 0; i < buf.length; ++i) {
+                        buf[i] = view[i];
+                      }
 
-                    console.log("crap",libraryItem.photoURL,e);
+                      ipfs.addFile({
+                        path: filePath,
+                        content: buf
+                      }).then((data) => {
+                        storage.get('storageCache').then((cache) => {
+
+                          cache.push(data[4]);
+                          storage.set('storageCache', cache);
+                        });
+
+                      }).catch((e) =>{
+
+                        console.log("crap",libraryItem.photoURL,e);
+
+                      });
+
+
+                    });
+
+                    reader.readAsArrayBuffer(blob);
+
 
                   });
-
-
-                });
-
-                reader.readAsArrayBuffer(blob);
-
+                }
 
               });
+
+
 
 
             });
